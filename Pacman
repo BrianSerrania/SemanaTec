@@ -1,6 +1,5 @@
 from random import choice
 from turtle import *
-
 from freegames import floor, vector
 
 state = {'score': 0}
@@ -39,9 +38,8 @@ tiles = [
 ]
 # fmt: on
 
-
 def square(x, y):
-    """Draw square using path at (x, y)."""
+
     path.up()
     path.goto(x, y)
     path.down()
@@ -53,17 +51,13 @@ def square(x, y):
 
     path.end_fill()
 
-
 def offset(point):
-    """Return offset of point in tiles."""
-    x = (floor(point.x, 20) + 200) / 20
-    y = (180 - floor(point.y, 20)) / 20
+    x = (floor(ghost.location_x, 20) + 200) / 20
+    y = (180 - floor(ghost_.location_y, 20)) / 20
     index = int(x + y * 20)
     return index
 
-
 def valid(point):
-    """Return True if point is valid in tiles."""
     index = offset(point)
 
     if tiles[index] == 0:
@@ -74,11 +68,9 @@ def valid(point):
     if tiles[index] == 0:
         return False
 
-    return point.x % 20 == 0 or point.y % 20 == 0
-
+    return ghost.location_x % 20 == 0 or ghost_.location_y % 20 == 0
 
 def world():
-    """Draw world using path."""
     bgcolor('black')
     path.color('blue')
 
@@ -95,9 +87,7 @@ def world():
                 path.goto(x + 10, y + 10)
                 path.dot(2, 'white')
 
-
 def move():
-    """Move pacman and all ghosts."""
     writer.undo()
     writer.write(state['score'])
 
@@ -116,26 +106,39 @@ def move():
         square(x, y)
 
     up()
-    goto(pacman.x + 10, pacman.y + 10)
+    goto(pacman.location_x + 10, pacman.location_y + 10)
     dot(20, 'yellow')
 
     for point, course in ghosts:
         if valid(point + course):
             point.move(course)
+            
+  #Agregamos la ubicación de pacman en la que definiremos las constantes del pacman y los fantasmas respectivamente
         else:
-            options = [
-                vector(5, 0),
-                vector(-5, 0),
-                vector(0, 5),
-                vector(0, -5),
+        #Derecha
+            if(pacman.location_x > ghost.location_x):
+                #Superior derecha
+                if(pacman.location_y > ghost_.location_y):
+                    options = [vector(5, 0),vector(0, 5)]
+                else:
+                    #Inferior derecha
+                    options = [vector(5, 0),vector(0, -5)]
+            else:
+                #Izquierda
+                if(pacman.location_y > ghost_.location_y):
+                    #ESuperior izquierda
+                    options = [vector(-5, 0),vector(0, 5)]
+                else:
+                    #Inferior izquierda
+                    options = [vector(-5, 0),vector(0, -5)]
             ]
             plan = choice(options)
             course.x = plan.x
             course.y = plan.y
 
         up()
-        goto(point.x + 10, point.y + 10)
-        dot(20, 'red')
+        goto(ghost.location_x + 10, point.y + 10)
+        dot(20, 'green')
 
     update()
 
@@ -145,9 +148,7 @@ def move():
 
     ontimer(move, 100)
 
-
 def change(x, y):
-    """Change pacman aim if valid."""
     if valid(pacman + vector(x, y)):
         aim.x = x
         aim.y = y
